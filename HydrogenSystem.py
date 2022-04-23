@@ -1,5 +1,5 @@
 import math
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt #For graphing
 #CALCULATION FOR H-H bond energy SYSTEM
 p_bo1=-0.016
 r_sig=0.7853
