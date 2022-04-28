@@ -10,7 +10,12 @@ param_VAE={"va_E1":1.49,"va_E2":1.28,"va_E3":6.30,"va_E4":2.72,
 "va_E5":33.87,"va_E6":6.70,"va_E7":1.06,"va_E8":2.04,
 "thet_HCH":69.94,"thet_HCC":71.56,"ka_HCC":29.65,
 "kb_HCC":5.29,"ka_HCH":69.94,"kb_HCH":1.00}
-param_TAE={"ta_E1":3.17,"ta_E2":10.00,"ta_E3":0.90}
+param_TAE={"ta_E1":3.17,"ta_E2":10.00,"ta_E3":0.90,"v2":26.5,"v3":0.37,"pt":-2.33}
+tors_angle=[0,-180,-180,-0]
+param_CSE={"cs_E1":-1.14,"cs_E2":2.17}
+param_VDW={"vd_E1":1.69,"lmd_w_C":1.41,"lmd_w_H":5.36,"lmd_w_CH":3.385,
+"alpha_CC":10.71,"alpha_CH":10.385,"alpha_HH":10.06,"d_CC":0.0862,"d_CH":0.0528,"d_HH":0.0194,
+"r_vdw_CC":3.912,"r_vdw_CH":3.7805,"rvdw_HH":3.649}
 #calculation for h-h vanderwaal energy calculation
 #alpha_hh=10.06
 #dbond_HH=0.0194
@@ -65,10 +70,28 @@ while(r_ij<=r_ij2):
     E_val_HCH=f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2))))
     E_val=2*(E_val_HCC+E_val_HCH)
     
+    #torsion angle energy
+    f_10=(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))(1-math.exp(-1*param_TAE["ta_E1"]*bo_c))(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))
+    f_11=(2+math.exp(-1*param_TAE["ta_E2"]*2*d_C))/(1+(2+math.exp(-1*param_TAE["ta_E2"]*2*d_C))+math.exp(param_TAE["ta_E3"]*2*d_C))
+    E_tors=0
+    for i in tors_angle:
+        E_tors+=f_10*(math.sin(math.radians(param_VAE["thet_HCC"])))*(math.sin(math.radians(param_VAE["thet_HCC"])))*((0.5*param_TAE["v2"]*math.exp(param_TAE["pt"]*((bo_c-3+f_11)**2)))*(1-math.cos(2*math.radians(tors_angle[i])))+(0.5*param_TAE["v3"]*(1+math.cos(math.radians(tors_angle[i])))))
+    
+    #Conjugated System Energy
+    f_12=math.exp(-1*param_CSE["cs_E2"]*(((param_BOE["bo_CH"])-1.5)**2))*math.exp(-1*param_CSE["cs_E2"]*(((param_BOE["bo_CH"])-1.5)**2))*math.exp(-1*param_CSE["cs_E2"]*((bo_c-1.5)**2))
+    E_cse=0
+    for i in tors_angle:
+        E_cse+=f_12*param_CSE["cs_E1"]*(1+(((math.cos(math.radians(tors_angle[i])))**2)-1)*param_VAE["thet_HCC"]*param_VAE["thet_HCC"])
     
     #vanderwaal energy calculation
-    #f_13=(((r_ij)**p_vdw)+((1/lmd_w)**p_vdw))**(1/p_vdw) #correction term
-    #e_vdw=dbond_HH*((math.exp(alpha_hh*(1-(f_13/r_vdw))))-(2*(math.exp(0.5*alpha_hh*(1-(f_13/r_vdw))))))
+    f_13_CC=(((r_ij)**param_VDW["vd_E1"])+((1/param_VDW["lmd_w_C"])**param_VDW["vd_E1"]))**(1/param_VDW["vd_E1"]) #correction term
+    f_13_CH=(((r_ij)**param_VDW["vd_E1"])+((1/param_VDW["lmd_w_CH"])**param_VDW["vd_E1"]))**(1/param_VDW["vd_E1"]) #correction term
+    f_13_HH=(((r_ij)**param_VDW["vd_E1"])+((1/param_VDW["lmd_w_H"])**param_VDW["vd_E1"]))**(1/param_VDW["vd_E1"]) #correction term
+    e_vdw_CC=param_VDW["d_CC"]*((math.exp(param_VDW["alpha_CC"]*(1-(f_13_CC/param_VDW["r_vdw_CC"]))))-(2*(math.exp(0.5*param_VDW["alpha_CC"]*(1-(f_13_CC/param_VDW["r_vdw_CC"]))))))
+    e_vdw_CH=param_VDW["d_CH"]*((math.exp(param_VDW["alpha_CH"]*(1-(f_13_CH/param_VDW["r_vdw_CH"]))))-(2*(math.exp(0.5*param_VDW["alpha_CH"]*(1-(f_13_CH/param_VDW["r_vdw_CH"]))))))
+    e_vdw_CC=param_VDW["d_HH"]*((math.exp(param_VDW["alpha_HH"]*(1-(f_13_HH/param_VDW["r_vdw_HH"]))))-(2*(math.exp(0.5*param_VDW["alpha_HH"]*(1-(f_13_HH/param_VDW["r_vdw_HH"]))))))
+    e_vdw=e_vdw_CC+e_vdw_CH+e_vdw_CC
+    
     #e_tot=e_vdw+e_bond
     #storing the values for plotting
     e_bond_graph.append(e_bond)
