@@ -1,0 +1,102 @@
+#ReaxFF Calculation for Ethylene System
+#gen_param={"l1":50.0,"l2":15.61,"l3":5.02,"l4":18.32,"l6":8.32,"l7":1.94,"l8":-3.47,"l9":5.79,"l10":12.38,"l11":1.49,"l12":1.28,"l13":6.30,"l14":2.72,"l15":33.87,"l16":6.70,"l17":1.06,"l":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":}
+import math
+import matplotlib.pyplot as plt #For graphing
+param_BOE={"p_bo1":-0.097,"p_bo2":38,"p_bo3":-0.26,"p_bo4":9.37,
+"p_boc3":5.02,"p_boc4":18.32,"p_boc5":8.32,"diss_Energy":145.2,
+"p_be1":0.318,"p_be2":0.65,"r_pi":1.266,"bo_CH":0.8703022784}
+param_UCE={"p_under":29.4,"uc_E1":1.94,"uc_E2":-3.47,"uc_E3":5.79,"uc_E4":12.38}
+param_VAE={"va_E1":1.49,"va_E2":1.28,"va_E3":6.30,"va_E4":2.72,
+"va_E5":33.87,"va_E6":6.70,"va_E7":1.06,"va_E8":2.04,
+"thet_HCH":69.94,"thet_HCC":71.56,"ka_HCC":29.65,
+"kb_HCC":5.29,"ka_HCH":69.94,"kb_HCH":1.00}
+param_TAE={"ta_E1":3.17,"ta_E2":10.00,"ta_E3":0.90}
+#calculation for h-h vanderwaal energy calculation
+#alpha_hh=10.06
+#dbond_HH=0.0194
+#r_vdw=3.649
+#lmd_w=5.36#lambda w values
+#p_vdw=1.69#vanderwaal energy
+e_bond_graph=[]
+#e_vdw_graph=[]
+e_rad_graph=[]
+#e_tot_graph=[]
+
+
+r_ij1=float(input(("Enter the starting radius range for calculation: ")))
+r_ij2=float(input(("Enter the ending radius range for calculation: ")))
+rad_incre=float(input(("Enter the radius gap for calculation: ")))
+print(str(r_ij1)+"---"+str(r_ij2))
+r_ij=r_ij1
+while(r_ij<=r_ij2):
+    #Bond energy calculation
+    bo_u=(math.exp(param_BOE["p_bo1"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo2"])))+(math.exp(param_BOE["p_bo3"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo4"])))#Bond Order Uncorrected
+    d_C=-4+bo_u+(2*param_BOE["bo_CH"])#Delta C Value
+    f_2=2*math.exp(-50*d_C)
+    f_3=d_C
+    f_1=(1+f_2)/(1+f_2+f_3)
+    f_4=1/(1+math.exp(((-1*param_BOE["p_boc3"])*((param_BOE["p_boc4"]*bo_u*bo_u)-d_C))+param_BOE["p_boc5"]))
+    f_5=f_4
+    bo_c=bo_u*f_1*f_4*f_5
+    e_bond=(math.exp(param_BOE["p_be1"]*(1-(bo_c**param_BOE["p_be2"])))*(-1)*param_BOE["diss_Energy"]*bo_c)
+    
+    #UnderCoordinationEnergy Calculation
+    f_6=1/(1+(param_UCE["uc_E3"]*math.exp(param_UCE["uc_E4"]*d_C*bo_c)))
+    e_under=-1*param_UCE["p_under"]*(1-math.exp(param_UCE["uc_E1"]*d_C))*f_6*(1/(1+math.exp(-1*param_UCE["uc_E3"]*d_C)))
+ 
+    #Valence Angle Energy Calculation
+    #HCC angles and HCH angles energy
+    f_7_HC=1-math.exp(-1*param_VAE["va_E1"]*(param_BOE["bo_CH"]**param_VAE["va_E2"]))
+    f_7_CC=1-math.exp(-1*param_VAE["va_E1"]*(bo_c**param_VAE["va_E2"]))
+    f_8=((2+math.exp(-1*param_VAE["va_E3"]*d_C))/(1+math.exp(-1*param_VAE["va_E3"]*d_C)))*(param_VAE["va_E4"]-((param_VAE["va_E4"]-1)*((2+math.exp(param_VAE["va_E5"]*d_C))/(1+math.exp(param_VAE["va_E5"]*d_C)))))
+    sbo_HCC=d_C-(2*(1-math.exp(-5*((0.5*d_C)**param_VAE["va_E6"]))))+bo_c
+    sbo_HCH=d_C-(2*(1-math.exp(-5*((0.5*d_C)**param_VAE["va_E6"]))))
+    if sbo_HCC>0:
+        sbo2_HCC=sbo_HCC**param_VAE["va_E7"]
+    else:
+        sbo2_HCC=0
+    if sbo_HCH>0:
+        sbo2_HCH=sbo_HCH**param_VAE["va_E7"]
+    else:
+        sbo2_HCH=0
+    thet0_HCC=180-(param_VAE["thet_HCC"]*(1-math.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCC))))
+    thet0_HCH=180-(param_VAE["thet_HCH"]*(1-math.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCH))))
+    E_val_HCC=f_7_CC*f_7_HC*f_8*(param_VAE["ka_HCC"]-(param_VAE["ka_HCC"]*math.exp(-1*param_VAE["kb_HCC"]*((thet0_HCC-param_VAE["thet_HCC"])**2))))
+    E_val_HCH=f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2))))
+    E_val=2*(E_val_HCC+E_val_HCH)
+    
+    
+    #vanderwaal energy calculation
+    #f_13=(((r_ij)**p_vdw)+((1/lmd_w)**p_vdw))**(1/p_vdw) #correction term
+    #e_vdw=dbond_HH*((math.exp(alpha_hh*(1-(f_13/r_vdw))))-(2*(math.exp(0.5*alpha_hh*(1-(f_13/r_vdw))))))
+    #e_tot=e_vdw+e_bond
+    #storing the values for plotting
+    e_bond_graph.append(e_bond)
+    #e_vdw_graph.append(e_vdw)
+    e_rad_graph.append(r_ij)
+    #e_tot_graph.append(e_tot)
+    
+
+    print("Radius:  "+str(r_ij)+"Bond Energy:   "+str(e_bond))
+    r_ij=r_ij+rad_incre
+
+# plotting the line 1 points
+plt.plot(e_rad_graph, e_bond_graph, label = " C=C bond energy")
+
+# plotting the line 2 points
+#plt.plot(e_rad_graph, e_vdw_graph, label = "van der waal graph")
+# plotting the line 3 points
+#plt.plot(e_rad_graph, e_tot_graph, label = "total energy graph")
+
+# naming the x axis
+plt.xlabel('c=c radius in angstroms')
+# naming the y axis
+plt.ylabel('energy in kcal/mol')
+# giving a title to my graph
+plt.title('Energy calculations for C=C System')
+ 
+# show a legend on the plot
+plt.legend()
+ 
+# function to show the plot
+plt.show()
