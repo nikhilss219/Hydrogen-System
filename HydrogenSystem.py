@@ -21,6 +21,7 @@ e_vdw_graph=[]
 e_rad_graph=[]
 e_tot_graph=[]
 
+
 r_ij1=float(input(("Enter the starting radius range for calculation")))
 r_ij2=float(input(("Enter the ending radius range for calculation")))
 rad_incre=float(input(("Enter the radius gap for calculation")))

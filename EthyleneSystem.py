@@ -1,4 +1,5 @@
 import math
+from re import X
 import matplotlib.pyplot as plt #For graphing
 #CALCULATION FOR Ethylene bond energy
 p_bo1=-0.097
@@ -40,7 +41,8 @@ while(r_ij<=r_ij2):
     bo_c=bo_u*f_1*f_4*f_5
     #Bond energy calculation
     e_bond=(math.exp(p_be1*(1-(bo_c**p_be2)))*(-1)*diss_Energy*bo_c)
-
+    x=(1+math.exp(33.87*d_C))
+    print(x)
     #vanderwaal energy calculation
     #f_13=(((r_ij)**p_vdw)+((1/lmd_w)**p_vdw))**(1/p_vdw) #correction term
     #e_vdw=dbond_HH*((math.exp(alpha_hh*(1-(f_13/r_vdw))))-(2*(math.exp(0.5*alpha_hh*(1-(f_13/r_vdw))))))
