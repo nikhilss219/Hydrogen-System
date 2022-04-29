@@ -1,8 +1,10 @@
 #ReaxFF Calculation for Ethylene System
 #gen_param={"l1":50.0,"l2":15.61,"l3":5.02,"l4":18.32,"l6":8.32,"l7":1.94,"l8":-3.47,"l9":5.79,"l10":12.38,"l11":1.49,"l12":1.28,"l13":6.30,"l14":2.72,"l15":33.87,"l16":6.70,"l17":1.06,"l":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":}
 import cmath
+from prettytable import PrettyTable
 import math
 import matplotlib.pyplot as plt #For graphing
+myTable = PrettyTable(["Radius", "E-Bond", "E-Under", "E-Tors","E-CSE","E-VDW","E-COl","E-TOT"])
 param_BOE={"p_bo1":-0.097,"p_bo2":38,"p_bo3":-0.26,"p_bo4":9.37,
 "p_boc3":5.02,"p_boc4":18.32,"p_boc5":8.32,"diss_Energy":145.2,
 "p_be1":0.318,"p_be2":0.65,"r_pi":1.266,"bo_CH":0.8703022784}
@@ -107,16 +109,14 @@ while(r_ij<=r_ij2):
     e_tot_graph.append(e_tot)
     
 
-    print("Radius:  "+str(r_ij)+"Bond Energy:   "+str(e_tot))
+    myTable.add_row([r_ij, e_bond,e_under,E_tors,E_cse,e_vdw,e_C,e_tot])
+    print("Radius:  "+str(r_ij)+"TotalEnergy:   "+str(e_tot))
     r_ij=r_ij+rad_incre
-
-# plotting the line 1 points
-#plt.plot(e_rad_graph, e_bond_graph, label = " C=C bond energy")
-
-# plotting the line 2 points
-#plt.plot(e_rad_graph, e_vdw_graph, label = "van der waal graph")
-# plotting the line 3 points
+print(myTable)
+# plotting the Energy points
 plt.plot(e_rad_graph, e_tot_graph, label = "total energy graph")
+#File_Object=open("Output.txt","w")
+#File_Object.write(myTable)
 
 # naming the x axis
 plt.xlabel('c=c radius in angstroms')
