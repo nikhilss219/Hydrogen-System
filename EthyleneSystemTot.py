@@ -1,10 +1,11 @@
 #ReaxFF Calculation for Ethylene System
 #gen_param={"l1":50.0,"l2":15.61,"l3":5.02,"l4":18.32,"l6":8.32,"l7":1.94,"l8":-3.47,"l9":5.79,"l10":12.38,"l11":1.49,"l12":1.28,"l13":6.30,"l14":2.72,"l15":33.87,"l16":6.70,"l17":1.06,"l":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":,"l5":}
 import cmath
+import numpy as np
 from prettytable import PrettyTable
 import math
 import matplotlib.pyplot as plt #For graphing
-myTable = PrettyTable(["Radius", "E-Bond", "E-Under", "E-Tors","E-CSE","E-VDW","E-COl","E-TOT"])
+myTable = PrettyTable(["Radius", "E-Bond", "E-Under","E_val","E-Tors","E-CSE","E-VDW","E-COl","E-TOT"])
 param_BOE={"p_bo1":-0.097,"p_bo2":38,"p_bo3":-0.26,"p_bo4":9.37,
 "p_boc3":5.02,"p_boc4":18.32,"p_boc5":8.32,"diss_Energy":145.2,
 "p_be1":0.318,"p_be2":0.65,"r_pi":1.266,"bo_CH":0.8703022784}
@@ -38,6 +39,7 @@ rad_incre=float(input(("Enter the radius gap for calculation: ")))
 print(str(r_ij1)+"---"+str(r_ij2))
 r_ij=r_ij1
 while(r_ij<=r_ij2):
+    
     #Bond energy calculation
     bo_u=(math.exp(param_BOE["p_bo1"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo2"])))+(math.exp(param_BOE["p_bo3"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo4"])))#Bond Order Uncorrected
     d_C=-4+bo_u+(2*param_BOE["bo_CH"])#Delta C Value
@@ -48,31 +50,32 @@ while(r_ij<=r_ij2):
     f_5=f_4
     bo_c=bo_u*f_1*f_4*f_5
     e_bond=(math.exp(param_BOE["p_be1"]*(1-(bo_c**param_BOE["p_be2"])))*(-1)*param_BOE["diss_Energy"]*bo_c)
-    
+    #print((-5*((0.5*d_C)**6.70)))
+    print(((0.5*d_C)**6.70))
     #UnderCoordinationEnergy Calculation
     f_6=1/(1+(param_UCE["uc_E3"]*math.exp(param_UCE["uc_E4"]*d_C*bo_c)))
     e_under=-1*param_UCE["p_under"]*(1-math.exp(param_UCE["uc_E1"]*d_C))*f_6*(1/(1+math.exp(-1*param_UCE["uc_E3"]*d_C)))
  
     #Valence Angle Energy Calculation
     #HCC angles and HCH angles energy
-    #f_7_HC=1-math.exp(-1*param_VAE["va_E1"]*(param_BOE["bo_CH"]**param_VAE["va_E2"]))
-    #f_7_CC=1-math.exp(-1*param_VAE["va_E1"]*(bo_c**param_VAE["va_E2"]))
-    #f_8=((2+math.exp(-1*param_VAE["va_E3"]*d_C))/(1+math.exp(-1*param_VAE["va_E3"]*d_C)))*(param_VAE["va_E4"]-((param_VAE["va_E4"]-1)*((2+math.exp(param_VAE["va_E5"]*d_C))/(1+math.exp(param_VAE["va_E5"]*d_C)))))
-    #sbo_HCC=d_C-(2*(1-(cmath.exp(-5*((0.5*d_C)**param_VAE["va_E6"])))))+bo_c
-    #sbo_HCH=d_C-(2*(1-cmath.exp(-5*((0.5*d_C)**param_VAE["va_E6"]))))
-    #if float(sbo_HCC)>0:
-    #    sbo2_HCC=sbo_HCC**param_VAE["va_E7"]
-    #else:
-     #   sbo2_HCC=0
-    #if sbo_HCH>0:
-     #   sbo2_HCH=sbo_HCH**param_VAE["va_E7"]
-    #else:
-    #    sbo2_HCH=0
-    #thet0_HCC=180-(param_VAE["thet_HCC"]*(1-math.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCC))))
-    #thet0_HCH=180-(param_VAE["thet_HCH"]*(1-math.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCH))))
-    #E_val_HCC=f_7_CC*f_7_HC*f_8*(param_VAE["ka_HCC"]-(param_VAE["ka_HCC"]*math.exp(-1*param_VAE["kb_HCC"]*((thet0_HCC-param_VAE["thet_HCC"])**2))))
-    #_val_HCH=f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2))))
-    #E_val=2*(E_val_HCC+E_val_HCH)
+    f_7_HC=1-math.exp(-1*param_VAE["va_E1"]*(param_BOE["bo_CH"]**param_VAE["va_E2"]))
+    f_7_CC=1-math.exp(-1*param_VAE["va_E1"]*(bo_c**param_VAE["va_E2"]))
+    f_8=((2+math.exp(-1*param_VAE["va_E3"]*d_C))/(1+math.exp(-1*param_VAE["va_E3"]*d_C)))*(param_VAE["va_E4"]-((param_VAE["va_E4"]-1)*((2+math.exp(param_VAE["va_E5"]*d_C))/(1+math.exp(param_VAE["va_E5"]*d_C)))))
+    sbo_HCC=d_C-(2*(1-(math.exp(abs((-5*((0.5*d_C)**6.70)))))))+bo_c
+    sbo_HCH=d_C-(2*(1-math.exp(abs(-5*((0.5*d_C)**param_VAE["va_E6"])))))
+    if float(sbo_HCC)>0:
+        sbo2_HCC=sbo_HCC**param_VAE["va_E7"]
+    else:
+       sbo2_HCC=0
+    if sbo_HCH>0:
+       sbo2_HCH=sbo_HCH**param_VAE["va_E7"]
+    else:
+        sbo2_HCH=0
+    thet0_HCC=180-round((param_VAE["thet_HCC"]*(1-np.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCC)))),6)
+    thet0_HCH=180-round((param_VAE["thet_HCH"]*(1-np.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCH)))),6)
+    E_val_HCC=round(f_7_CC*f_7_HC*f_8*(param_VAE["ka_HCC"]-round((param_VAE["ka_HCC"]*np.exp(-1*param_VAE["kb_HCC"]*((thet0_HCC-param_VAE["thet_HCC"])**2))),6)),6)
+    E_val_HCH=round(f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2)))),6)
+    E_val=2*(E_val_HCC+E_val_HCH)   
     
     #torsion angle energy
     f_10=(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))*(1-math.exp(-1*param_TAE["ta_E1"]*bo_c))*(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))
@@ -101,7 +104,7 @@ while(r_ij<=r_ij2):
     e_C_CC=param_CIE["shielded_constant"]*param_CIE["q_C"]*param_CIE["q_C"]/((((r_ij)**3)+((1/param_CIE["del_C"])**3))**(1/3))
     e_C=(4*e_C_CH)+e_C_CC
 
-    e_tot=e_bond+e_under+E_tors+E_cse+e_vdw+e_C
+    e_tot=241+e_bond+e_under+E_tors+E_cse+e_vdw+e_C+E_val
     #storing the values for plotting
     #e_bond_graph.append(e_bond)
     #e_vdw_graph.append(e_vdw)
@@ -109,7 +112,7 @@ while(r_ij<=r_ij2):
     e_tot_graph.append(e_tot)
     
 
-    myTable.add_row([r_ij, e_bond,e_under,E_tors,E_cse,e_vdw,e_C,e_tot])
+    myTable.add_row([r_ij, e_bond,e_under,E_val,E_tors,E_cse,e_vdw,e_C,e_tot])
     print("Radius:  "+str(r_ij)+"TotalEnergy:   "+str(e_tot))
     r_ij=r_ij+rad_incre
 print(myTable)
