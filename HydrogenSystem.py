@@ -43,7 +43,7 @@ while(r_ij<=r_ij2):
     e_C=param_CIE["shielded_Constant"]*param_CIE["q_H"]*param_CIE["q_H"]/((((r_ij)**3)+((1/param_CIE["del_H"])**3))**(1/3))
     
 
-    e_tot=e_bond+e_vdw+e_C
+    e_tot=100.01175828774689+e_bond+e_vdw+e_C
     #storing the values for plotting
     #e_C_graph.append(e_C)
     e_bond_graph.append(e_bond)
@@ -57,9 +57,9 @@ while(r_ij<=r_ij2):
 print(myTable)
 # plotting the Energy points
 plt.plot(e_rad_graph, e_tot_graph, label = "Total energy graph")
-plt.plot(e_rad_graph, e_bond_graph, label = "Bond energy graph")
-plt.plot(e_rad_graph, e_vdw_graph, label = "VanDerWaal energy graph")
-#plt.plot(e_C_graph, e_vdw_graph, label = "Coulomb Energy Line")
+#plt.plot(e_rad_graph, e_bond_graph, label = "Bond energy graph")
+#plt.plot(e_rad_graph, e_vdw_graph, label = "VanDerWaal energy graph")
+#clplt.plot(e_C_graph, e_vdw_graph, label = "Coulomb Energy Line")
 
 
 

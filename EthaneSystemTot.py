@@ -75,7 +75,7 @@ while(r_ij<=r_ij2):
     thet0_HCH=180-round((param_VAE["thet_HCH"]*(1-np.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCH)))),6)
     E_val_HCC=round(f_7_CC*f_7_HC*f_8*(param_VAE["ka_HCC"]-round((param_VAE["ka_HCC"]*np.exp(-1*param_VAE["kb_HCC"]*((thet0_HCC-param_VAE["thet_HCC"])**2))),6)),6)
     E_val_HCH=round(f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2)))),6)
-    E_val=(E_val_HCC+(E_val_HCH))   
+    E_val=(4*E_val_HCC+6*(E_val_HCH))   
     
     #torsion angle energy
     f_10=(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))*(1-math.exp(-1*param_TAE["ta_E1"]*bo_c))*(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))
@@ -102,9 +102,9 @@ while(r_ij<=r_ij2):
     #coloumb Interaction Energy
     e_C_CH=param_CIE["shielded_constant"]*param_CIE["q_C"]*param_CIE["q_H"]/((((r_ij)**3)+((1/param_CIE["del_CH"])**3))**(1/3))
     e_C_CC=param_CIE["shielded_constant"]*param_CIE["q_C"]*param_CIE["q_C"]/((((r_ij)**3)+((1/param_CIE["del_C"])**3))**(1/3))
-    e_C=(6*e_C_CH)+e_C_CC
+    e_C=(e_C_CH)+e_C_CC
 
-    e_tot=e_bond+E_tors+e_vdw+e_C
+    e_tot=e_bond+E_val+E_tors+e_vdw+e_C
     #storing the values for plotting
     #e_bond_graph.append(e_bond)
     #e_vdw_graph.append(e_vdw)

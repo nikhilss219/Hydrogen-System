@@ -5,7 +5,7 @@ import numpy as np
 from prettytable import PrettyTable
 import math
 import matplotlib.pyplot as plt #For graphing
-myTable = PrettyTable(["Radius", "E-Bond", "E-Under","E_val","E-Tors","E-CSE","E-VDW","E-COl","E-TOT"])
+myTable = PrettyTable(["Radius", "E-Bond", "E-Under","E-Val","E-Tors","E-CSE","E-VDW","E-COl","E-TOT"])
 param_BOE={"p_bo1":-0.097,"p_bo2":6.38,"p_bo3":-0.26,"p_bo4":9.37,"p_bo5":-0.391,"p_bo6":16.87,
 "p_boc3":5.02,"p_boc4":18.32,"p_boc5":8.32,"diss_Energy":145.2,
 "p_be1":0.318,"p_be2":0.65,"r_pi_pi":1.236,"bo_CH":0.8884124621}
@@ -40,7 +40,7 @@ r_ij=r_ij1
 while(r_ij<=r_ij2):
     
     #Bond energy calculation
-    bo_u=(math.exp(param_BOE["p_bo1"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo2"])))+(math.exp(param_BOE["p_bo3"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo4"])))+(math.exp(param_BOE["p_bo5"]*((r_ij/param_BOE["r_pi"])**param_BOE["p_bo6"])))#Bond Order Uncorrected
+    bo_u=(math.exp(param_BOE["p_bo1"]*((r_ij/param_BOE["r_pi_pi"])**param_BOE["p_bo2"])))+(math.exp(param_BOE["p_bo3"]*((r_ij/param_BOE["r_pi_pi"])**param_BOE["p_bo4"])))+(math.exp(param_BOE["p_bo5"]*((r_ij/param_BOE["r_pi_pi"])**param_BOE["p_bo6"])))#Bond Order Uncorrected
     d_C=-4+bo_u+param_BOE["bo_CH"]#Delta C Value
     f_2=2*math.exp(-50*d_C)
     f_3=d_C
@@ -71,8 +71,8 @@ while(r_ij<=r_ij2):
     thet0_HCC=180-round((param_VAE["thet_HCC"]*(1-np.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCC)))),6)
     #thet0_HCH=180-round((param_VAE["thet_HCH"]*(1-np.exp(-1*param_VAE["va_E8"]*(2-sbo2_HCH)))),6)
     E_val_HCC=round(f_7_CC*f_7_HC*f_8*(param_VAE["ka_HCC"]-round((param_VAE["ka_HCC"]*np.exp(-1*param_VAE["kb_HCC"]*((thet0_HCC-param_VAE["thet_HCC"])**2))),6)),6)
-    #E_val_HCH=round(f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2)))),6)
     E_val=2*(E_val_HCC)   
+    #E_val_HCH=round(f_7_HC*f_7_HC*f_8*(param_VAE["ka_HCH"]-(param_VAE["ka_HCH"]*math.exp(-1*param_VAE["kb_HCH"]*((thet0_HCH-param_VAE["thet_HCH"])**2)))),6)
     
     #torsion angle energy
     f_10=(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))*(1-math.exp(-1*param_TAE["ta_E1"]*bo_c))*(1-math.exp(-1*param_TAE["ta_E1"]*param_BOE["bo_CH"]))
@@ -99,16 +99,16 @@ while(r_ij<=r_ij2):
     #coloumb Interaction Energy
     e_C_CH=param_CIE["shielded_constant"]*param_CIE["q_C"]*param_CIE["q_H"]/((((r_ij)**3)+((1/param_CIE["del_CH"])**3))**(1/3))
     e_C_CC=param_CIE["shielded_constant"]*param_CIE["q_C"]*param_CIE["q_C"]/((((r_ij)**3)+((1/param_CIE["del_C"])**3))**(1/3))
-    e_C=(4*e_C_CH)+e_C_CC
+    e_C=(e_C_CH)+e_C_CC
 
-    e_tot=e_bond+e_under+E_tors+E_cse+e_vdw+e_C+E_val
+    e_tot=183.93962989207452+e_bond+e_under+E_val+E_tors+E_cse+e_vdw+e_C
     #storing the values for plotting
     e_bond_graph.append(e_bond)
     e_vdw_graph.append(e_vdw)
     e_rad_graph.append(r_ij)
     e_tot_graph.append(e_tot)
     e_under_graph.append(e_under)
-    e_val_graph.append(E_val)
+    #e_val_graph.append(E_val)
     e_cse_graph.append(E_cse)
     e_tors_graph.append(E_tors)
     e_C_graph.append(e_C)
@@ -118,24 +118,24 @@ while(r_ij<=r_ij2):
 print(myTable)
 # plotting the Energy points
 plt.plot(e_rad_graph, e_tot_graph, label = "total energy graph")
-plt.plot(e_rad_graph, e_C_graph, label = "Coulomb energy line")
-plt.plot(e_rad_graph, e_cse_graph, label = "Conjugated System Energy")
-plt.plot(e_rad_graph, e_val_graph, label = "Valence Energy Graph")
-plt.plot(e_rad_graph, e_bond_graph, label = "Bond Energy Graph")
-plt.plot(e_rad_graph, e_under_graph, label = "Under Coordination Energy")
-plt.plot(e_rad_graph, e_tors_graph, label = "Torsion Energy")
-plt.plot(e_rad_graph, e_vdw_graph, label = "VanDerWaal Energy")
+#plt.plot(e_rad_graph, e_C_graph, label = "Coulomb energy line")
+#plt.plot(e_rad_graph, e_cse_graph, label = "Conjugated System Energy")
+#plt.plot(e_rad_graph, e_val_graph, label = "Valence Energy Graph")
+#plt.plot(e_rad_graph, e_bond_graph, label = "Bond Energy Graph")
+#plt.plot(e_rad_graph, e_under_graph, label = "Under Coordination Energy")
+#plt.plot(e_rad_graph, e_tors_graph, label = "Torsion Energy")
+#plt.plot(e_rad_graph, e_vdw_graph, label = "VanDerWaal Energy")
 
 
 #File_Object=open("Output.txt","w")
 #File_Object.write(myTable)
 
 # naming the x axis
-plt.xlabel('c=c radius in angstroms')
+plt.xlabel('C-C radius in angstroms')
 # naming the y axis
 plt.ylabel('energy in kcal/mol')
 # giving a title to my graph
-plt.title('Energy calculations for C=C System')
+plt.title('Energy calculations for Ethyne System')
  
 # show a legend on the plot
 plt.legend()

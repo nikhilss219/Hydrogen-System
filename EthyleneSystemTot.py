@@ -107,7 +107,7 @@ while(r_ij<=r_ij2):
     e_C_CC=param_CIE["shielded_constant"]*param_CIE["q_C"]*param_CIE["q_C"]/((((r_ij)**3)+((1/param_CIE["del_C"])**3))**(1/3))
     e_C=(4*e_C_CH)+e_C_CC
 
-    e_tot=e_bond+e_under+E_tors+E_cse+e_vdw+e_C+E_val
+    e_tot=191.7545822856465+e_bond+e_under+E_tors+E_cse+e_vdw+e_C+E_val
     #storing the values for plotting
     e_bond_graph.append(e_bond)
     e_vdw_graph.append(e_vdw)
@@ -124,13 +124,13 @@ while(r_ij<=r_ij2):
 print(myTable)
 # plotting the Energy points
 plt.plot(e_rad_graph, e_tot_graph, label = "total energy graph")
-plt.plot(e_rad_graph, e_C_graph, label = "Coulomb energy line")
-plt.plot(e_rad_graph, e_cse_graph, label = "Conjugated System Energy")
-plt.plot(e_rad_graph, e_val_graph, label = "Valence Energy Graph")
-plt.plot(e_rad_graph, e_bond_graph, label = "Bond Energy Graph")
-plt.plot(e_rad_graph, e_under_graph, label = "Under Coordination Energy")
-plt.plot(e_rad_graph, e_tors_graph, label = "Torsion Energy")
-plt.plot(e_rad_graph, e_vdw_graph, label = "VanDerWaal Energy")
+#plt.plot(e_rad_graph, e_C_graph, label = "Coulomb energy line")
+#plt.plot(e_rad_graph, e_cse_graph, label = "Conjugated System Energy")
+#plt.plot(e_rad_graph, e_val_graph, label = "Valence Energy Graph")
+#plt.plot(e_rad_graph, e_bond_graph, label = "Bond Energy Graph")
+#plt.plot(e_rad_graph, e_under_graph, label = "Under Coordination Energy")
+#plt.plot(e_rad_graph, e_tors_graph, label = "Torsion Energy")
+#plt.plot(e_rad_graph, e_vdw_graph, label = "VanDerWaal Energy")
 
 
 #File_Object=open("Output.txt","w")
